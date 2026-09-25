@@ -1,1 +1,122 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Movies World</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index-style.css?v=5.6">
+    <meta charset="UTF-8">
+    <meta name="author" content="Habib Atlouma">
+    <meta name="theme-color" content="#00FAFA">
+    <meta name="description" content="Best Movies of All Time. The movies on this list are ranked according to my perosnal opinion. The list is made to be useful to anybody who is looking for a great movie to watch away from typical lists. It does not represent any institution and is a non-commercial project.">
+
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-
+
+bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Movies World">
+    
+    <link rel="icon" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/android-chrome-512x512.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/android-chrome-192x192.png">
+    <link rel="apple-touch-startup-image" type="image/png" sizes="512x512" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/android-chrome-512x512.png">
+    <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/favicon-32x32.png">
+
+    <link rel="icon" type="image/png" sizes="16x16" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/favicon-16x16.png">
+    <link rel="manifest" href="https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/site.webmanifest">
+
+    <!-- Supabase JS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <main>
+    <div class="container">
+        <h1>Best Movies of All Time</h1>
+        
+        <!-- Dynamic list will load here -->
+        <ol id="movie-list">
+            <li>Loading movies...</li>
+        </ol>
+    </div>
+
+    <div class="disclaimer">
+
+        <p class="text">
+            Dear reader,<br> 
+            This is a non-commercial and non-profit site. The movie order reflects my personal opinion and not that of any organization or institution. I don't own the movie titles, trailers, or images, which belong to their respective copyright holders. All movies listed are so extraordinary that any ranking falls under fair use for commentary and non-commercial purposes.<br><br>
+            I strive for accuracy, there might be unintentional inaccuracies.<br>
+            Feel free to email me your comments at: <a href="mailto:habibtoumabeol@gmail.com">habibtoumabeol@gmail.com</a>
+        </p>
+    </div>
+    </main>
+
+    <script>
+        // Replace these two strings with your actual Supabase details from API settings
+
+        const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Helper function to format large numbers (e.g., 1000 -> 1k)
+        function formatVotes(votes) {
+            if (!votes || votes <= 0) return "0";
+            if (votes >= 1000000) return (votes / 1000000).toFixed(1) + 'M';
+            if (votes >= 1000) return (votes / 1000).toFixed(1) + 'K';
+            return votes.toString();
+        }
+
+        async function loadMovies() {
+            // JOIN movies_details with movie_ratings using Supabase relational query
+            const { data: movies, error } = await 
+
+supabaseClient
+                .from('movies_details')
+                .select(`
+                    id,
+                    title,
+                    poster,
+                    movie_ratings (
+                        total_points,
+                        total_votes
+                    )
+                `)
+                .order('id', { ascending: true });
+
+            const listContainer = document.getElementById('movie-list');
+
+            if (error) {
+                console.error('Error loading movies:', error);
+                listContainer.innerHTML = '<li>Error loading movies. Please try again later.</li>';
+                return;
+            }
+
+            listContainer.innerHTML = ''; // Clear loading text
+
+            movies.forEach(movie => {
+                // Get ratings array if present
+                const rating = movie.movie_ratings && movie.movie_ratings.length > 0 ? movie.movie_ratings[0] : null;
+                const totalVotes = rating ? rating.total_votes : 0;
+                const totalPoints = rating ? rating.total_points : 0;
+
+                const avgScore = totalVotes > 0 ? (totalPoints / totalVotes).toFixed(1) : "0";
+                const formattedVotes = totalVotes > 0 ? formatVotes(totalVotes) : "0";
+
+                const listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <a href="movie.html?id=${movie.id}" class="movie-link">
+                        ${movie.title}
+
+                        <img src="${movie.poster || ''}" class="hover-preview" decoding="async" alt="poster">
+                    </a>
+                    <span style="color:orange; font-weight:bold; margin-left:10px;">★ ${avgScore} (${formattedVotes})</span>
+                `;
+                listContainer.appendChild(listItem);
+            });
+        }
+
+        loadMovies();
+    </script>
+</body>
+</html>
+
