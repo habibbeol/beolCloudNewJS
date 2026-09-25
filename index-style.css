@@ -1,1 +1,142 @@
+/* --- PC / DEFAULT STYLES --- */
+body {
+      background-image: url('https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/main-background-done.webp'); /* */
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+    background-size: cover;
+    margin: 0;
+    padding: 0;
+    font-family: serif;
+    -webkit-text-size-adjust: 100%;
+}
+
+.container {
+    position: absolute;
+    top: 5vh;
+    left: 0.7vmin; /* */
+    width: 60vmin;
+    background-color: rgba(0, 0, 0, 0.447);
+    padding: 20px;
+    border-radius: 6px;
+    display: inline-block; /* */
+
+}
+
+h1 { color: white; 
+}
+
+ol { margin-left: 6px;
+padding-left:25px;
+} /* */
+
+li { font-size: 3.7vmin; color: rgb(0, 250, 250); margin-bottom:6px; } /* */
+
+a {
+    color: rgb(0, 250, 250);
+    text-decoration: none;
+    
+}
+
+a:hover { color: pink; } /* */
+
+.disclaimer {
+    position: fixed;
+    bottom: 0;
+    right: 1vmin; /* */
+    width: 750px; /* */
+    background-color: rgba(0, 0, 0, 0.24);
+    padding: 10px;
+    border-radius: 6px;
+    display: inline-block;
+   
+
+}
+
+.text {
+    width: 100%; /* */
+    color: white;
+    font-size: 3.3vmin;
+    margin-left: 4px; /* */
+}
+
+/* --- MOBILE OVERRIDES (The missing piece!) --- */
+@media (max-aspect-ratio: 16/9) {
+    body {
+        background-image: url("https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/wall-done.webp"); /* */
+        background-size: cover;
+        overflow-x: hidden;
+        width: 100vw;
+        position: relative;
+    }
+    @supports (-webkit-touch-callout:none){
+        body {
+            background-attachment: scroll !important;
+            background-size: 100% auto !important;
+            background-position: top;
+            background-repeat: no-repeat;
+        }
+    }
+    .hover-preview {
+        display: none !important;
+        pointer-events: none !important;
+    }
+    
+    .container {
+        width: 95vw; /* */
+        position: relative; /* */
+        background-color: rgba(0, 0, 0, 0); /* */
+    }
+   
+    ol{
+        margin-left: 0;
+        padding-left: 0;
+    }
+    li {
+        word-break: break-word !important;
+        list-style-position: inside;
+    }
+  
+
+    .disclaimer {
+
+        position: relative; /* */
+        width: 85vw; /* */
+        bottom: 0vmin;
+        right: 0vmin;
+        margin-top: 3vw;
+    }
+    
+    .text { width: 84vw; } /* */
+}
+
+/* --- MOVIE HOVER PREVIEW --- */
+
+/* 1. This hides the image and shrinks it down */
+.hover-preview {
+    display: none;
+    position: absolute;
+    width:120px;
+    height: 160px;
+    border:2px solid orange;
+    border-radius: 8px;
+    margin-left:20px;
+    z-index:999;
+    box-shadow: 0px 5px 15px rgba(0,0,0,0.8);
+    pointer-events:none;
+    bottom:-50%;
+}
+
+/* 2. This shows the image when you hover the link */
+.movie-link:hover .hover-preview {
+    display: inline-block;
+   
+}
+
+/* 3. This helps the pop-up stay postitioned correctly */
+li{
+    position: relative ;
+}
+
+
 
