@@ -87,9 +87,7 @@ span></div>
         // Replace with your actual Supabase credentials
         const SUPABASE_URL = 'https://npnyjarjsudbpzpdyvby.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_w82HTtIztIiPMOv7aK1oTw_XgjuLJIP';
-        const supabaseClient = 
-
-supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // Extract ID from URL (?id=X)
         const urlParams = new URLSearchParams(window.location.search);
