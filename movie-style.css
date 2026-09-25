@@ -1,1 +1,229 @@
+/* --- GLOBAL RESET --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: block !important; /* Stops Global Centering */
+}
+
+/* --- CONTAINER (Top-Left) --- */
+.container {
+    position: absolute !important;
+    top: 0vmin !important;      /* */
+    left: 0.3vmin !important;   /* */
+    margin: 0 !important;
+    border-radius: 6px;
+    z-index: 10;
+    padding: 1vmin ;
+}
+
+h1 {
+    
+    margin-top: 0px;           
+    font-size: 5.2vmin;
+    font-family: serif;
+    padding:0 rem;
+}
+
+
+p {
+           
+    font-size: 3.7vmin;
+    font-family: serif;
+    
+}
+#val{
+    color: white !important;
+    font-weight:bold;
+    margin-left:4PX;
+}
+
+/* --- TRAILER (Bottom-Right) --- */
+iframe {
+    position: absolute !important;
+    bottom: 0vmin !important;   /* */
+    right: 0vmin !important;    /* */
+    border-radius: 6px;
+    width: 25vw;                /* */
+    height: 42vh;               /* */
+}
+
+/* --- MOBILE OVERRIDES --- */
+@media (max-aspect-ratio: 16/9) {
+    iframe {
+        bottom: 0vh !important; /* */
+        left: 0vw !important;   /* */
+        width: 66vw;
+        height:20vh ;
+        
+    }
+    .container {
+  position: absolute !important;
+    }
+
+}
+ .fire-text{
+        font-family: 'impact',sans-serif;
+                color:#ff8c00;
+                text-shadow:
+                0 0 5px #ff0c00,
+                0 0 10px #ff3c00,
+                0 0 15px #ff6c00,
+                0 0 20px  #ff8c00,
+                0 0 25px  #ff9c00;
+                animation:flicker 2s infinite alternate;
+                color:rgb(255, 115, 0);
+                text-shadow :300px;
+                margin-top: -2;
+                font-size: 7.2vmin;
+               padding: 0.1rem;
+                 margin-left: 4;
+            }
+            @keyframes flicker{
+                0%{
+                opacity: 8;
+                    text-shadow:
+                    0 0 5px #ff1c00,
+                    0 0 10px #ff2c00,
+                    0 0 15px #ff3c00,
+                    0 0 20px #ff4c00,
+                    0 0 25px #ff5c00,
+                    0px 100% 5px #ffae00;
+                }
+                50%{
+                    text-shadow:
+                    0 0 2px #ff0c00,
+                    0 0 4px #ff1c00,
+                    0 0 6px #ff2c00,
+                    0 0 8px #ff3c00,
+                    0 0 10px #ff4c00;
+                }
+                100%{
+                    text-shadow:
+                    0 0 5px #ff3c00,
+                    0 0 10px #ff4c00,
+                    0 0 15px #ff5c00,
+                    0 0 20px #ff6c00,
+                    0 0 25px #ff7c00,
+                    0px 100% 60px #ffae00;
+                }
+            }
+#status {
+    color: white;
+}
+
+/* this is the code for the hand gestures in order to swipe left and right */
+/* Container positioning */
+.movie-container {
+  position: relative;
+}
+
+/* Base Overlay */
+.nav-hint-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Keeps clicks working normally */
+  z-index: 999;
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+
+.nav-hint-overlay.fade-out {
+  opacity: 0;
+
+}
+
+/* Side Indicators */
+.hint-side {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 12px;
+  backdrop-filter: blur(4px);
+  font-size: 12px;
+  font-weight: 600;
+  gap: 6px;
+}
+
+.hint-left { left: 20px; }
+.hint-right { right: 20px; }
+
+.hand-icon {
+
+  font-size: 24px;
+}
+
+/* Toggle Text between Desktop & Mobile */
+.hint-text-mobile { display: none; }
+.hint-text-desktop { display: block; }
+
+@media (hover: none) and (pointer: coarse) {
+  .hint-text-mobile { display: block; 
+    font-size: 11px;
+    }
+     
+    #navHint {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        padding:0 16px;
+        box-sizing: border-box;
+    }
+    
+    .hint-left, .hint-right {
+        background: rgba(0, 0, 0, 0.75);
+        padding: 4px 8px;
+        border-radius: 10px;
+        max-width: 42%;
+        text-align: center;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        width: fit-content;
+    }
+    .hand-icon {
+        font-size: 11px;
+        display: inline-block;
+    }
+    
+    
+  .hint-text-desktop { display: none;
+    }
+}
+
+/* Animations */
+@keyframes nudgeLeft {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-8px); }
+}
+
+@keyframes nudgeRight {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(8px); }
+}
+
+.swipe-left-anim {
+
+  animation: nudgeLeft 1.5s infinite ease-in-out;
+}
+
+.swipe-right-anim {
+  animation: nudgeRight 1.5s infinite ease-in-out;
+}
+
 
