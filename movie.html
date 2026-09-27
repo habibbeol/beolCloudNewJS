@@ -45,20 +45,20 @@
         }
 
 /* === START 3D CUBE EFFECT === */
-        body { perspective: 1000px;
-              overflow-x: hidden;
+        main { perspective: 1000px;
              }
         #movie-container {
-            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s;
+            transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
             transfom-style: preserve-3d;
             backface-visibility: hidden;
         }
-        #movie-container.rotate-left {
-            transform: rotateY(-90deg) scale(0.85);
+        /* Flip Animations */ 
+        .flip-out-left {
+            transform: rotateY(-90deg);
             opacity: 0;
         }
-        #movie-container.rotate-right {
-            transform: rotateY(90deg) scale(0.85);
+        .flip-out-right {
+            transform: rotateY(90deg);
             opacity: 0;
         }
         /* ===END 3D CUBE EFFECT ===*/
