@@ -43,6 +43,26 @@
         @media (max-aspect-ratio: 16/9) {
             .rating-box { bottom: 20vh; left: 0px; width: 66vw; }
         }
+
+/* === START 3D CUBE EFFECT === */
+        body { perspective: 1000px;
+              overflow-x: hidden;
+             }
+        #movie-container {
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s;
+            transfom-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        #movie-container.rotate-left {
+            transform: rotateY(-90deg) scale(0.85);
+            opacity: 0;
+        }
+        #movie-container.rotate-right {
+            transform: rotateY(90deg) scale(0.85);
+            opacity: 0;
+        }
+        /* ===END 3D CUBE EFFECT ===*/
+        
     </style>
 
 
