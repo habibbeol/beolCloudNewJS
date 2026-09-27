@@ -276,17 +276,22 @@ window.location.href = "index.html"; };
         });
 
 const swup = new Swup();
-        swup.hooks.on('page:view', () => {
-            if (document.getElementById('movie-details')) {
-                loadMovieDetails();
-            }
-        });
 
-        if (document.readyState === 'complete' || document.readyState === 'interactive') {
-            if (document.getElementById('movie-details')) {
+        function initHomePage() {
+            if (document.getElementById('movie-container')) {
                 loadMovieDetails();
             }
         }
+        //Trigger on Swup page swap
+        swup.hooks.on('page:view', initMoviePage);
+
+        //Trigger on direct initial page load 
+        if (document.readyState === 'complete' || document.readyState === 'interative') {
+            initHomePage();
+        } else{
+            document.addEventListener('DOMContentLoaded',initMoviePage);
+        }
+
         
     </script>
 </body>
