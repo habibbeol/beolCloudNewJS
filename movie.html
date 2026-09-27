@@ -292,11 +292,6 @@ span></div>
         // === END 3D CUBE NAVIGATION ===
        
 
-        history.pushState(null, null, location.href);
-        window.onpopstate = function () { 
-
-window.location.href = "index.html"; };
-
         function dismissHint() {
             const hint = document.getElementById("navHint");
             if (hint) {
