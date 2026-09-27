@@ -45,22 +45,11 @@
         }
     </style>
 
-//this is the swup library to help transition smoothly between pages//
-    <script src="https://unpkg.com/swup@4"></script>
-    <style>
-        /* Define the fade transition */
-        .transition-fade {
-            transition: opacity 0.3s ease-in-out;
-            opacity: 1;
-        }
-        html.is-animating .transition-fade {
-            opacity: 0;
-        }
-    </style>
+
     
 </head>
 <body>
-    <main id="swup" class="transition-fade">
+    <main>
     <div id="navHint" class="nav-hint-overlay">
       <div class="hint-side hint-left">
         <div class="hand-icon swipe-left-anim">👈</div>
@@ -274,25 +263,7 @@ window.location.href = "index.html"; };
                 hint.remove();
             }
         });
-
-const swup = new Swup();
-
-        function initHomePage() {
-            if (document.getElementById('movie-container')) {
-                loadMovieDetails();
-            }
-        }
-        //Trigger on Swup page swap
-        swup.hooks.on('page:view', initMoviePage);
-
-        //Trigger on direct initial page load 
-        if (document.readyState === 'complete' || document.readyState === 'interative') {
-            initHomePage();
-        } else{
-            document.addEventListener('DOMContentLoaded',initMoviePage);
-        }
-
-        
+       
     </script>
 </body>
 </html>
