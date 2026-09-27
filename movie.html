@@ -278,17 +278,15 @@ span></div>
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            loadMovieDetails();
+
             const hint = document.getElementById("navHint");
             if (!hint) return;
             if (!sessionStorage.getItem("hasSeenNavHint")) {
                 setTimeout(dismissHint, 5000);
-            } else {
-
+            } else{
                 hint.remove();
             }
-        });
-        document.addEventListener('DOMContentLoaded', () => {
-            loadMovieDetails();
         });
        
     </script>
