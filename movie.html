@@ -249,22 +249,22 @@ span></div>
                 window.location.href = targetUrl;
             }, 300);
         }
-
+       // Swipe left (Next Movie)
         mc.on("swipeleft", () => { 
             dismissHint(); 
             if (currentId < 100) { 
-                window.location.href = `movie.html?id=${currentId + 1}`; 
+                animateAndGo('left', `movie.html?id=${currentId + 1}`); 
             } else { 
-                window.location.href = 'index.html'; 
+                animateAndGo('left', 'index.html'); 
             }
         });
-
+        // Swipe right (Previous Movie)
         mc.on("swiperight", () => { 
             dismissHint(); 
             if (currentId > 1) { 
-                window.location.href = `movie.html?id=${currentId - 1}`; 
+                animateAndGo('right', `movie.html?id=${currentId - 1})`; 
             } else { 
-                window.location.href = 'index.html'; 
+                animateAndGo('right', 'index.html'); 
             }
         });
        
