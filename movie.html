@@ -236,7 +236,7 @@ span></div>
         loadMovieData();
 
     // === START 3D CUBE NAVIGATION ===
-        function navigateMovieWithCube(diretion, targetID) {
+        function navigateMovieWithCube(direction, targetID) {
             const container = document.getElementById('movie-container');
             if (!container) return;
             //1. Trigger rotate out
@@ -273,10 +273,10 @@ span></div>
         // Swipe Left (Next Movie)
         mc.on("swipeleft", () => {
             dismissHint(),[span_6](start_span)[span_6](end_span)
-            if (vurrentId <100) {
+            if (currentId <100) {
                 navigateMovieWithCube('left', currentId +1);
             } else{
-                window.locatin.href = 'index.html';[span_7](start_span)[span7](end_span)
+                window.location.href = 'index.html';[span_7](start_span)[span7](end_span)
             }
         });
 
@@ -290,14 +290,7 @@ span></div>
             }
         });
         // === END 3D CUBE NAVIGATION ===
-        mc.on("swiperight", () => { 
-            dismissHint(); 
-            if (currentId > 1) { 
-                window.location.href = `movie.html?id=${currentId - 1}`; 
-            } else { 
-                window.location.href = 'index.html'; 
-            }
-        });
+       
 
         history.pushState(null, null, location.href);
         window.onpopstate = function () { 
