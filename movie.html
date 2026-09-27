@@ -240,7 +240,7 @@ span></div>
         mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
 
         //Helper to trigger animation before page change
-        function animateAndgo(direction, targetUrl) {
+        function animateAndGo(direction, targetUrl) {
             const container = document.getElementById('movie-container');
             if (container){
                 container.classList.add(direction === 'left' ? 'flip-out-left' : 'flip-out-right');
