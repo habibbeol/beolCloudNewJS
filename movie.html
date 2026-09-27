@@ -235,61 +235,21 @@ span></div>
 
         loadMovieData();
 
-    // === START 3D CUBE NAVIGATION ===
-        function navigateMovieWithCube(direction, targetID) {
-            const container = document.getElementById('movie-container');
-            if (!container) return;
-            //1. Trigger rotate out
-            const animationClass = direction === 'left' ? 'rotate-left' : 'rotate-right';
-            container.classList.add(animationClass);
-
-            //2. Midway through spin (300ms), fetch new movie and update URL without full page reload
-            setTimeout(() => {
-                window.history.pushState({}, '', `movie.html?id=${targetId}`);
-                // Update global currentId variable so next swipes work
-                currentId = targetId;
-
-                //Fetch and display new movie details
-                loadMovieDetails();
-
-                // Reset container to opposite side instantly for seamless entry
-                container.style.transition = 'none';
-                container.classList.remove('rotate-left', 'rotate-right');
-                container.classList.add(direction === 'left' ? 'rotate-right' : 'rotate-left');
-
-                // Force browser repaint, then smoothly rotate back to center
-                setTimeout(() => {
-                    container.style.transition = 'transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.3s';
-                    container.classList.remove('rotate-left', 'rotate-right');
-                }, 50);
-
-            }, 300);
-        }
-
-        //Hammer.js Setup
+       // Hammer.js Navigation
         const mc = new Hammer(document.body);
-        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, 
 
-        // Swipe Left (Next Movie)
-        mc.on("swipeleft", () => {
-            dismissHint()
-            if (currentId <100) {
-                navigateMovieWithCube('left', currentId +1);
-            } else{
-                window.location.href = 'index.html';
+velocity: 0.1 });
+
+        mc.on("swipeleft", () => { 
+            dismissHint(); 
+            if (currentId < 100) { 
+                window.location.href = `movie.html?id=${currentId + 1}`; 
+            } else { 
+                window.location.href = 'index.html'; 
             }
         });
 
-        // Swipe Right (Previous Movie)
-        mc.on("swiperight", () => {
-            dismissHint();
-            if (currentId > 1) {
-                navigateMovieWithCube('right', currentId -1);
-            } else{
-                window.location.href = 'index.html';
-            }
-        });
-        // === END 3D CUBE NAVIGATION ===
        
 
         function dismissHint() {
