@@ -237,9 +237,18 @@ span></div>
 
        // Hammer.js Navigation
         const mc = new Hammer(document.body);
-        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, 
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
 
-velocity: 0.1 });
+        //Helper to trigger animation before page change
+        function animateAndgo(direction, targetUrl) {
+            const container = document.getElementById('movie-container');
+            if (container){
+                container.classList.add(direction === 'left' ? 'flip-out-left' : 'flip-out-right');
+            }
+            setTimeout(() => {
+                window.location.href = targetUrl;
+            }, 300);
+        }
 
         mc.on("swipeleft", () => { 
             dismissHint(); 
