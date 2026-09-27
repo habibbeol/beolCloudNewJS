@@ -262,15 +262,12 @@ span></div>
         mc.on("swiperight", () => { 
             dismissHint(); 
             if (currentId > 1) { 
-                animateAndGo('right', `movie.html?id=${currentId - 1})`; 
+                animateAndGo('right', `movie.html?id=${currentId - 1}`); 
             } else { 
                 animateAndGo('right', 'index.html'); 
             }
         });
        
-
-       
-
         function dismissHint() {
             const hint = document.getElementById("navHint");
             if (hint) {
