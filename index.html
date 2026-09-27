@@ -131,13 +131,21 @@ supabaseClient
 
 const swup = new Swup();
 
-        //re-run movie loading logic when navigating back to index.html
-        swup.hooks.on('page:view', () => {
+        function initHomePage() {
             if (document.getElementById('movie-list')) {
-        
-        loadMovies();
+                loadMovies();
             }
-        });
+        }
+        //Trigger on Swup page swap
+        swup.hooks.on('page:view', initHomePage);
+
+        //Trigger on direct initial page load 
+        if (document.readyState === 'complete' || document.readyState === 'interative') {
+            initHomePage();
+        } else{
+            document.addEventListener('DOMContentLoaded',initHomePage);
+        }
+
     </script>
 </body>
 </html>
