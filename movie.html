@@ -218,51 +218,38 @@ span></div>
 
           // Hammer.js Navigation
         const mc = new Hammer(document.body);
-        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, 
+    mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
+    const currentId = <?php echo $mid; ?>;
+    mc.on("swipeleft", () => { dismissHint(); if(currentId < 100) { window.location.href = `movie.php?id=${currentId + 1}`; } else { window.location.href = 'index.php'; }} );
+        
+    mc.on("swiperight", () => { dismissHint(); if(currentId > 1) { window.location.href = `movie.php?id=${currentId - 1}`; }
+        else { window.location.href = 'index.php'; }
+    });
+        
+        history.pushState(null, null, location.href);
+        
+        window.onpopstate = function () { window.location.href = "index.php";};
+        
+  function dismissHint() {
+      const hint = document.getElementById("navHint");
+      if (hint) {
+          hint.classList.add("fade-out");
+          setTimeout(() => hint.remove() , 800);
+      }
+      sessionStorage.setItem("hasSeenNavHint", "true");
+  }
+document.addEventListener("DOMContentLoaded", () => {
+  const hint = document.getElementById("navHint");
+  if (!hint) return;
 
-velocity: 0.1 });
-
-        mc.on("swipeleft", () => { 
-            dismissHint(); 
-            if (currentId < 100) { 
-                window.location.href = `movie.html?id=${currentId + 1}`; 
-            } else { 
-                window.location.href = 'index.html'; 
-            }
-        });
-
-
-          mc.on("swiperight", () => { 
-            dismissHint(); 
-            if (currentId > 1) { 
-                window.location.href = `movie.html?id=${currentId - 1}`; 
-            } else { 
-                window.location.href = 'index.html'; 
-            }
-        });
-
-
-        function dismissHint() {
-            const hint = document.getElementById("navHint");
-            if (hint) {
-                hint.classList.add("fade-out");
-                setTimeout(() => hint.remove(), 800);
-            }
-            sessionStorage.setItem("hasSeenNavHint", "true");
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            loadMovieDetails();
-
-            const hint = document.getElementById("navHint");
-            if (!hint) return;
-            if (!sessionStorage.getItem("hasSeenNavHint")) {
-                setTimeout(dismissHint, 5000);
-            } else{
-                hint.remove();
-            }
-        });
-       
+  // Check if the user has already seen the hint in this browser session
+  if (!sessionStorage.getItem("hasSeenNavHint")) {
+    // 1. Automatically dismiss after 5 seconds
+    const timer = setTimeout(dismissHint, 5000);
+  } else {
+      hint.remove();
+  }
+});
     </script>
 </body>
 </html>
