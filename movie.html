@@ -219,11 +219,24 @@ span></div>
           // Hammer.js Navigation
         const mc = new Hammer(document.body);
     mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
-    const currentId = <?php echo $mid; ?>;
-    mc.on("swipeleft", () => { dismissHint(); if(currentId < 100) { window.location.href = `movie.php?id=${currentId + 1}`; } else { window.location.href = 'index.html'; }} );
+
+
+                mc.on("swipeleft", () => { 
+            dismissHint(); 
+            if (currentId < 100) { 
+                window.location.href = `movie.html?id=${currentId + 1}`; 
+            } else { 
+                window.location.href = 'index.html'; 
+            }
+        });
         
-    mc.on("swiperight", () => { dismissHint(); if(currentId > 1) { window.location.href = `movie.php?id=${currentId - 1}`; }
-        else { window.location.href = 'index.html'; }
+   
+    mc.on("swiperight", () => {
+        dismissHint();
+        if(currentId > 1) {
+            window.location.href = `movie.html?id=${currentId - 1}`; }
+        else {
+            window.location.href = 'index.html'; }
     });
         
         history.pushState(null, null, location.href);
