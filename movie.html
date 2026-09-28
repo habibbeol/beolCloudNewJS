@@ -235,39 +235,32 @@ span></div>
 
         loadMovieData();
 
-       // Hammer.js Navigation
+          // Hammer.js Navigation
         const mc = new Hammer(document.body);
-        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
+        mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, 
 
-        //Helper to trigger animation before page change
-        function animateAndGo(direction, targetUrl) {
-            const container = document.getElementById('movie-container');
-            if (container){
-                container.classList.add(direction === 'left' ? 'flip-out-left' : 'flip-out-right');
-            }
-            setTimeout(() => {
-                window.location.href = targetUrl;
-            }, 300);
-        }
-       // Swipe left (Next Movie)
+velocity: 0.1 });
+
         mc.on("swipeleft", () => { 
             dismissHint(); 
             if (currentId < 100) { 
-                animateAndGo('left', `movie.html?id=${currentId + 1}`); 
+                window.location.href = `movie.html?id=${currentId + 1}`; 
             } else { 
-                animateAndGo('left', 'index.html'); 
+                window.location.href = 'index.html'; 
             }
         });
-        // Swipe right (Previous Movie)
-        mc.on("swiperight", () => { 
+
+
+          mc.on("swiperight", () => { 
             dismissHint(); 
             if (currentId > 1) { 
-                animateAndGo('right', `movie.html?id=${currentId - 1}`); 
+                window.location.href = `movie.html?id=${currentId - 1}`; 
             } else { 
-                animateAndGo('right', 'index.html'); 
+                window.location.href = 'index.html'; 
             }
         });
-       
+
+
         function dismissHint() {
             const hint = document.getElementById("navHint");
             if (hint) {
