@@ -66,8 +66,9 @@ a:hover { color: pink; } /* */
         background-image: url("https://raw.githubusercontent.com/habibbeol/habib-s-movies-list/main/wall-done.webp"); /* */
         background-size: cover;
         overflow-x: hidden;
-        width: 100vw;
+        width: 100%;
         position: relative;
+        background-attachment: fixed;
     }
     @supports (-webkit-touch-callout:none){
         body {
