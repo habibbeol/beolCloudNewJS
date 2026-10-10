@@ -232,7 +232,7 @@ mc.on("swipeleft", () => {
   dismissHint();
   if (currentId < 100) { 
     currentId++; 
-    loadMovie(currentId); 
+    loadMovieData(); 
   } else { 
     window.location.href = 'index.html'; 
   }
@@ -243,7 +243,7 @@ mc.on("swiperight", () => {
   dismissHint();
   if (currentId > 1) { 
     currentId--; 
-    loadMovie(currentId); 
+    loadMovieData(); 
   } else { 
     window.location.href = 'index.html'; 
   }
