@@ -254,11 +254,11 @@ function loadMovie(id) {
   // Update global variable if needed for voting
   mid = id;
 
-  const SUPABASE_URL = "https://YOUR_PROJECT_ID.supabase.co/rest/v1/movies?id=eq." + id;
-  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+  const SUPABASE_URL = "https://npnyjarjsudbpzpdyvby.supabase.co/rest/v1/movies?id=eq." + id;
+  const SUPABASE_ANON_KEY = "sb_publishable_w82HTtIztIiPMOv7aK1oTw_XgjuLJIP";
 
   fetch(SUPABASE_URL, {
-
+    
     headers: {
       "apikey": SUPABASE_ANON_KEY,
       "Authorization": "Bearer " + SUPABASE_ANON_KEY
