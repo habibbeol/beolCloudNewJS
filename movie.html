@@ -189,7 +189,26 @@ async function loadMovieData() {
       }
     }
   `;
+
+  // Download the neighbours' backgrounds now, so the next swipe shows them instantly
+  preloadBackgrounds(idToLoad + 1);
+  preloadBackgrounds(idToLoad - 1);
+
   return 'ok';
+}
+
+// ---------- Download a movie's background images ahead of time ----------
+async function preloadBackgrounds(id) {
+  if (id < 1 || id > lastId) return;
+  const { data } = await supabaseClient
+    .from('movies_details')
+    .select('background, background_phone')
+    .eq('id', id)
+    .maybeSingle();
+  if (!data) return;
+  [data.background, data.background_phone].forEach(url => {
+    if (url) new Image().src = url;   // the browser downloads it and keeps it
+  });
 }
 
 // ---------- Ask the database how many movies there are ----------
