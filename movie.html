@@ -1,279 +1,287 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta charset="UTF-8">
-    <meta name="author" content="Habib Atlouma">
-    <meta name="theme-color" content="#00FAFA">
-    <meta name="description" content="Best Movies of All Time. The movies on this list are ranked according to my perosnal opinion. The list is made to be useful to anybody who is looking for a great movie to watch away from typical lists. It does not represent any institution and is a non-commercial project.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="author" content="Habib Atlouma">
+<meta name="theme-color" content="#00FAFA">
+<meta name="description" content="Best Movies of All Time. The movies on this list are ranked according to my perosnal opinion. The list is made to be useful to anybody who is looking for a great movie to watch away from typical lists. It does not represent any institution and is a non-commercial project.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Movies World">
+<link rel="apple-touch-startup-image" href="android-chrome-192x192.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<title id="page-title">Loading Movie...</title>
+<link rel="stylesheet" href="movie-style.css?v=3.9">
+<link rel="manifest" href="site.webmanifest">
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Movies World">
+<!-- Supabase JS Library -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<!-- Static styles (never change) -->
+<style>
+.rating-box {
+  position: absolute;
+  bottom: 2vmin;
+  right: 27vw;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 2px;
+  border-radius: 7px;
+  text-align: center;
+  z-index: 20;
+}
+.stars span { cursor: pointer; font-size: 28px; transition: 0.2s; }
+@media (max-aspect-ratio: 16/9) {
+  .rating-box { bottom: 20vh; left: 0px; width: 66vw; }
+}
+</style>
 
-    <link rel="apple-touch-startup-image" href="android-chrome-192x192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-
-    <title id="page-title">Loading Movie...</title>
-
-    <link rel="stylesheet" href="movie-style.css?v=3.9">
-    <link rel="manifest" href="site.webmanifest">
-
-    <!-- Supabase JS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-    <style id="dynamic-db-styles">
-        /* Dynamic styles will be injected here via JavaScript */
-        .rating-box { 
-
-            position: absolute;
-            bottom: 2vmin;
-            right: 27vw;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 2px;
-            border-radius: 7px;
-            text-align: center;
-            z-index: 20;
-        }
-        .stars span { cursor: pointer; font-size: 28px; transition: 0.2s; }
-        @media (max-aspect-ratio: 16/9) {
-            .rating-box { bottom: 20vh; left: 0px; width: 66vw; }
-        }
-
-    </style>
-
-
-    
+<!-- Dynamic styles: JavaScript REPLACES the content of this tag for every movie -->
+<style id="dynamic-db-styles"></style>
 </head>
+
 <body>
-   
-    <div id="navHint" class="nav-hint-overlay">
-      <div class="hint-side hint-left">
-        <div class="hand-icon swipe-left-anim">👈</div>
-        <span class="hint-text-mobile">Swipe right for previous</span>
 
-        <span class="hint-text-desktop">Drag right for previous</span>
-      </div>
-      <div class="hint-side hint-right">
-        <div class="hand-icon swipe-right-anim">👉</div>
-        <span class="hint-text-mobile">Swipe left for next</span>
-        <span class="hint-text-desktop">Drag left for next</span>
-      </div>
-    </div>
+<div id="navHint" class="nav-hint-overlay">
+  <div class="hint-side hint-left">
+    <div class="hand-icon swipe-left-anim">👈</div>
+    <span class="hint-text-mobile">Swipe right for previous</span>
+    <span class="hint-text-desktop">Drag right for previous</span>
+  </div>
+  <div class="hint-side hint-right">
+    <div class="hand-icon swipe-right-anim">👉</div>
+    <span class="hint-text-mobile">Swipe left for next</span>
+    <span class="hint-text-desktop">Drag left for next</span>
+  </div>
+</div>
 
-    <div class="container" id="movie-container">
-        <h1 id="movie-heading">Loading...</h1>
-        <p id="movie-desc"></p>
-        <a id="back-button" href="index.html" style="padding:3px; display:inline-block; text-decoration: none; margin-left: 1rem;">← BACK</a>
-    </div>
+<div class="container" id="movie-container">
+  <h1 id="movie-heading">Loading...</h1>
+  <p id="movie-desc"></p>
+  <a id="back-button" href="index.html" style="padding:3px; display:inline-block; text-decoration: none; margin-left: 1rem;">← BACK</a>
+</div>
 
-    <div class="rating-box" id="rating-box">
-        <div id="status">⭐ <span id="val">0.0</
+<div class="rating-box" id="rating-box">
+  <div id="status">⭐ <span id="val">0.0</span> <span id="vote-msg"></span></div>
+  <div class="stars">
+    <span onclick="sendVote(1)">⭐</span>
+    <span onclick="sendVote(2)">⭐</span>
+    <span onclick="sendVote(3)">⭐</span>
+    <span onclick="sendVote(4)">⭐</span>
+    <span onclick="sendVote(5)">⭐</span>
+  </div>
+</div>
 
-span></div>
-        <div class="stars">
-            <span onclick="sendVote(1)">⭐</span>
-            <span onclick="sendVote(2)">⭐</span>
-            <span onclick="sendVote(3)">⭐</span>
-            <span onclick="sendVote(4)">⭐</span>
-            <span onclick="sendVote(5)">⭐</span>
-        </div>
-    </div>
+<iframe id="trailer-frame" allowfullscreen></iframe>
 
-    <iframe id="trailer-frame" allowfullscreen></iframe>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
-
-    <script>
-        // Replace with your actual Supabase credentials
-        const SUPABASE_URL = 'https://npnyjarjsudbpzpdyvby.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_w82HTtIztIiPMOv7aK1oTw_XgjuLJIP';
-        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Extract ID from URL (?id=X)
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentId = parseInt(urlParams.get('id')) || 1;
-
-        async function loadMovieData() {
-            // Fetch movie details and rating from Supabase
-            const { data: movie, error } = await supabaseClient
-                .from('movies_details')
-                .select(`
-                    *,
-                    movie_ratings (
-                        total_points,
-                        total_votes
-                    )
-                `)
-                .eq('id', currentId)
-                .single();
-
-
-            if (error || !movie) {
-                document.body.innerHTML = "<h1>Movie Not Found</h1><a href='index.html'>Back to Home</a>";
-                return;
-            }
-
-            // Calculate Rating
-            const ratingData = movie.movie_ratings && movie.movie_ratings.length > 0 ? movie.movie_ratings[0] : null;
-            const totalVotes = ratingData ? ratingData.total_votes : 0;
-            const totalPoints = ratingData ? ratingData.total_points : 0;
-            const avgScore = totalVotes > 0 ? (totalPoints / totalVotes).toFixed(1) : "0.0";
-            const ranking = movie.ranking || currentId;
-
-            // Populate HTML elements
-            document.title = movie.title;
-            document.getElementById('val').innerText = avgScore;
-
-            
-            const heading = document.getElementById('movie-heading');
-            heading.innerText = `${ranking}. ${movie.title}`;
-            if (movie['lava-color']) heading.classList.add(movie['lava-color']);
-
-            document.getElementById('movie-desc').innerText = movie.description || '';
-            document.getElementById('trailer-frame').src = movie.trailer_url || '';
-
-            const backBtn = document.getElementById('back-button');
-            if (movie['lava-color']) backBtn.classList.add(movie['lava-color']);
-            if (movie.back_button) backBtn.style.color = movie.back_button;
-
-            // Inject Dynamic DB CSS Styles
-            const styleElement = document.getElementById('dynamic-db-styles');
-            styleElement.innerHTML += `
-
-                body { 
-                    background-image: url('${movie.background || ''}'); 
-                    background-repeat: no-repeat;
-                    background-attachment: fixed;
-                    background-size: 100% 100%;
-                    background-position: center;
-                }
-                .container { 
-                    width: ${movie.container_width_PC || 'auto'} !important; 
-                    background-color: ${movie.container_BG_PC || 'transparent'}; 
-                }
-                h1 { color: ${movie.title_color_PC || '#fff'}; }
-                p { color: ${movie.desc_color_PC || '#fff'}; }
-                iframe { border: 1px solid ${movie.title_color_PC || '#fff'}; }
-                .rating-box { border: 1px solid ${movie.title_color_PC || '#fff'}; }
-
-                @media (max-aspect-ratio: 16/9) {
-
-                    body { 
-                        background-image: url('${movie.background_phone || ''}'); 
-                        background-size: ${movie.BG_size_phone || 'cover'};
-                    }
-                    .container {
-                        width: ${movie.container_width_phone || '100%'} !important;
-                        background-color: ${movie.container_BG_phone || 'transparent'};
-                        padding-left: 0;
-                        padding-right: 0;
-                        margin: 0;
-                    }
-                    h1 { color: ${movie.title_color_phone || '#fff'}; }
-                    p { 
-                        color: ${movie.desc_color_phone || '#fff'}; 
-                        width: ${movie.p_width_phone || '100%'};
-                        margin: 0 auto;
-
-                    }
-                }
-            `;
-        }
-
-        // Direct Supabase Vote function (Replaces vote.php)
-        async function sendVote(stars) {
-            // First fetch current points and votes
-            const { data: rating } = await supabaseClient
-                .from('movie_ratings')
-                .select('*')
-                .eq('movie_id', currentId)
-                .single();
-
-            let newPoints = stars;
-            let newVotes = 1;
-
-            if (rating) {
-                newPoints = (rating.total_points || 0) + stars;
-                newVotes = (rating.total_votes || 0) + 1;
-
-                await supabaseClient
-                    .from('movie_ratings')
-                    .update({ total_points: newPoints, total_votes: newVotes })
-                    .eq('movie_id', currentId);
-            } else {
-                await supabaseClient
-                    .from('movie_ratings')
-                    .insert([{ movie_id: currentId, total_points: newPoints, total_votes: newVotes }]);
-            }
-
-            document.getElementById('status').innerHTML = "Voted!";
-        }
-
-        loadMovieData();
-
-          // Hammer.js Navigation
-      
+<!-- Hammer.js is loaded ONCE -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
+<!-- ONE script block, every variable declared ONCE -->
 <script>
-// 1. Get the current movie ID safely from the URL parameter (e.g. movie.html?id=1)
+// ---------- Supabase ----------
+const SUPABASE_URL = 'https://npnyjarjsudbpzpdyvby.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_w82HTtIztIiPMOv7aK1oTw_XgjuLJIP';
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ---------- State ----------
 const urlParams = new URLSearchParams(window.location.search);
-let currentId = parseInt(urlParams.get('id')) || 1;
+let currentId = parseInt(urlParams.get('id')) || 1;   // "let", because it changes when you swipe
+let lastId = 100;                                      // replaced by the real value from the database
+let loadCounter = 0;                                   // used to ignore outdated answers
 
-// 2. Set up Hammer.js swipe gestures
-const mc = new Hammer(document.body);
-mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
+// ---------- Show a message instead of wiping the whole page ----------
+function showMessage(text) {
+  document.getElementById('movie-heading').innerText = text;
+  document.getElementById('movie-desc').innerText = '';
+  document.getElementById('trailer-frame').src = 'about:blank';
+  document.getElementById('dynamic-db-styles').textContent = '';
+  document.getElementById('val').innerText = '0.0';
+  document.getElementById('vote-msg').innerText = '';
+  document.title = text;
+}
 
-mc.on("swipeleft", () => {
-  dismissHint();
-  if (currentId < 100) { 
-    currentId++; 
-    loadMovieData(); 
-  } else { 
-    window.location.href = 'index.html'; 
-  }
-});
+// ---------- Load ONE movie from Supabase and fill the page ----------
+// Returns 'ok', 'missing', 'error' or 'stale'
+async function loadMovieData() {
+  const myLoad = ++loadCounter;     // number of this request
+  const idToLoad = currentId;
 
+  const { data: movie, error } = await supabaseClient
+    .from('movies_details')
+    .select(`
+      *,
+      movie_ratings (
+        total_points,
+        total_votes
+      )
+    `)
+    .eq('id', idToLoad)
+    .maybeSingle();                 // no row = null (not an error)
 
-mc.on("swiperight", () => {
-  dismissHint();
-  if (currentId > 1) { 
-    currentId--; 
-    loadMovieData(); 
-  } else { 
-    window.location.href = 'index.html'; 
-  }
-});
+  // If you swiped again while we were waiting, throw this answer away
+  if (myLoad !== loadCounter) return 'stale';
 
-// 3. Direct Supabase fetch function (No PHP needed!)
+  if (error) { showMessage('Could not load movie'); return 'error'; }
+  if (!movie) { showMessage('Movie Not Found'); return 'missing'; }
 
-        window.onpopstate = function () { window.location.href = "index.html";};
-        
-  function dismissHint() {
-      const hint = document.getElementById("navHint");
-      if (hint) {
-          hint.classList.add("fade-out");
-          setTimeout(() => hint.remove() , 800);
+  // Rating (movie_ratings can come back as an array or as one object)
+  const r = movie.movie_ratings;
+  const ratingData = Array.isArray(r) ? (r[0] || null) : (r || null);
+  const totalVotes = ratingData ? ratingData.total_votes : 0;
+  const totalPoints = ratingData ? ratingData.total_points : 0;
+  const avgScore = totalVotes > 0 ? (totalPoints / totalVotes).toFixed(1) : "0.0";
+  const ranking = movie.ranking || idToLoad;
+
+  // Fill the HTML
+  document.title = movie.title;
+  document.getElementById('val').innerText = avgScore;
+  document.getElementById('vote-msg').innerText = '';        // clear "Voted!" from the previous movie
+
+  const heading = document.getElementById('movie-heading');
+  heading.innerText = `${ranking}. ${movie.title}`;
+  heading.className = movie['lava-color'] || '';              // replace the class, don't pile them up
+
+  document.getElementById('movie-desc').innerText = movie.description || '';
+  document.getElementById('trailer-frame').src = movie.trailer_url || 'about:blank';
+
+  const backBtn = document.getElementById('back-button');
+  backBtn.className = movie['lava-color'] || '';
+  backBtn.style.color = movie.back_button || '';
+
+  // Dynamic CSS: "=" replaces the old movie's styles ("+=" would pile them up forever)
+  document.getElementById('dynamic-db-styles').textContent = `
+    body {
+      background-image: url('${movie.background || ''}');
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: 100% 100%;
+      background-position: center;
+    }
+    .container {
+      width: ${movie.container_width_PC || 'auto'} !important;
+      background-color: ${movie.container_BG_PC || 'transparent'};
+    }
+    h1 { color: ${movie.title_color_PC || '#fff'}; }
+    p { color: ${movie.desc_color_PC || '#fff'}; }
+    iframe { border: 1px solid ${movie.title_color_PC || '#fff'}; }
+    .rating-box { border: 1px solid ${movie.title_color_PC || '#fff'}; }
+
+    @media (max-aspect-ratio: 16/9) {
+      body {
+        background-image: url('${movie.background_phone || ''}');
+        background-size: ${movie.BG_size_phone || 'cover'};
       }
-      sessionStorage.setItem("hasSeenNavHint", "true");
+      .container {
+        width: ${movie.container_width_phone || '100%'} !important;
+        background-color: ${movie.container_BG_phone || 'transparent'};
+        padding-left: 0;
+        padding-right: 0;
+        margin: 0;
+      }
+      h1 { color: ${movie.title_color_phone || '#fff'}; }
+      p {
+        color: ${movie.desc_color_phone || '#fff'};
+        width: ${movie.p_width_phone || '100%'};
+        margin: 0 auto;
+      }
+    }
+  `;
+  return 'ok';
+}
+
+// ---------- Ask the database how many movies there are ----------
+async function loadLastId() {
+  const { data } = await supabaseClient
+    .from('movies_details')
+    .select('id')
+    .order('id', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (data && data.id) lastId = data.id;
+}
+
+// ---------- Go to the next (+1) or previous (-1) movie ----------
+function goToMovie(step) {
+  dismissHint();
+  const newId = currentId + step;
+  if (newId < 1 || newId > lastId) {
+    window.location.href = 'index.html';     // same behaviour as before at the ends
+    return;
   }
+  currentId = newId;
+  // Update the address bar WITHOUT reloading and WITHOUT adding a history entry,
+  // so refresh/share keeps the right movie and BACK still goes to index.html
+  history.replaceState(null, '', '?id=' + currentId);
+  loadMovieData();
+}
+
+// ---------- Voting ----------
+async function sendVote(stars) {
+  const votedId = currentId;                 // remember which movie was voted, even if you swipe meanwhile
+
+  const { data: rating } = await supabaseClient
+    .from('movie_ratings')
+    .select('*')
+    .eq('movie_id', votedId)
+    .maybeSingle();
+
+  let newPoints = stars;
+  let newVotes = 1;
+
+  if (rating) {
+    newPoints = (rating.total_points || 0) + stars;
+    newVotes = (rating.total_votes || 0) + 1;
+    await supabaseClient
+      .from('movie_ratings')
+      .update({ total_points: newPoints, total_votes: newVotes })
+      .eq('movie_id', votedId);
+  } else {
+    await supabaseClient
+      .from('movie_ratings')
+      .insert([{ movie_id: votedId, total_points: newPoints, total_votes: newVotes }]);
+  }
+
+  // Only touch the screen if we are still on the movie that was voted
+  if (votedId === currentId) {
+    document.getElementById('val').innerText = (newPoints / newVotes).toFixed(1);
+    document.getElementById('vote-msg').innerText = 'Voted!';
+  }
+}
+
+// ---------- Swipe hint ----------
+function dismissHint() {
+  const hint = document.getElementById("navHint");
+  if (hint) {
+    hint.classList.add("fade-out");
+    setTimeout(() => hint.remove(), 800);
+  }
+  try { sessionStorage.setItem("hasSeenNavHint", "true"); } catch (e) {}
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const hint = document.getElementById("navHint");
   if (!hint) return;
-
-  // Check if the user has already seen the hint in this browser session
-  if (!sessionStorage.getItem("hasSeenNavHint")) {
-    // 1. Automatically dismiss after 5 seconds
-    const timer = setTimeout(dismissHint, 5000);
+  let seen = false;
+  try { seen = !!sessionStorage.getItem("hasSeenNavHint"); } catch (e) {}
+  if (!seen) {
+    setTimeout(dismissHint, 5000);           // auto-hide after 5 seconds
   } else {
-      hint.remove();
+    hint.remove();
   }
 });
-    </script>
+
+// ---------- Hammer.js swipe ----------
+const mc = new Hammer(document.body);
+mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velocity: 0.1 });
+mc.on("swipeleft",  () => goToMovie(+1));    // swipe left  -> next movie
+mc.on("swiperight", () => goToMovie(-1));    // swipe right -> previous movie
+
+// ---------- Start ----------
+loadMovieData();
+loadLastId();
+</script>
 </body>
 </html>
-
