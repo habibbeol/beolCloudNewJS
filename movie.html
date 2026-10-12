@@ -36,6 +36,8 @@
 @media (max-aspect-ratio: 16/9) {
   .rating-box { bottom: 20vh; left: 0px; width: 66vw; }
 }
+/* While the slide animation runs, never show a sideways scrollbar */
+html.is-swiping { overflow-x: hidden; }
 </style>
 
 <!-- Dynamic styles: JavaScript REPLACES the content of this tag for every movie -->
@@ -86,46 +88,105 @@ const SUPABASE_URL = 'https://npnyjarjsudbpzpdyvby.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_w82HTtIztIiPMOv7aK1oTw_XgjuLJIP';
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ---------- Slide animation settings (change these two numbers to taste) ----------
+const SLIDE_MS = 350;            // total time: half to leave, half to arrive
+const SLIDE_DISTANCE_VW = 15;    // how far the content travels, in % of the screen width
+
 // ---------- State ----------
 const urlParams = new URLSearchParams(window.location.search);
-let currentId = parseInt(urlParams.get('id')) || 1;   // "let", because it changes when you swipe
+let currentId = parseInt(urlParams.get('id')) || 1;   // the movie we are going to (changes when a swipe starts)
+let shownId = currentId;                               // the movie on the screen right now (used for voting)
 let lastId = 100;                                      // replaced by the real value from the database
-let loadCounter = 0;                                   // used to ignore outdated answers
+let busy = false;                                      // true while a swipe animation is running
+let queuedStep = 0;                                    // a swipe made during an animation waits here
+
+// ---------- The three things that slide together ----------
+const movieContainer = document.getElementById('movie-container');
+const ratingBox = document.getElementById('rating-box');
+const trailerFrame = document.getElementById('trailer-frame');
+const slideTargets = [movieContainer, ratingBox, trailerFrame];
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+const canAnimate = typeof Element.prototype.animate === 'function';
+
+// ---------- Trailer ----------
+// location.replace() changes the video WITHOUT adding a browser-history entry.
+// (Setting iframe.src adds one each time, and the Back button would then step
+// through every old trailer before leaving the page.)
+function setTrailer(url) {
+  const target = url || 'about:blank';
+  try {
+    trailerFrame.contentWindow.location.replace(target);
+  } catch (e) {
+    trailerFrame.src = target;
+  }
+}
+
+// ---------- Leave the movie page the way the browser's Back arrow would ----------
+// Plain links add a NEW history entry, so after the link the Back arrow would return
+// to the movie you just left. Instead:
+//  - if you came from the index page, go back to it (no new entry);
+//  - otherwise (Google, a shared link...) replace this page with the index, so the
+//    next Back goes to wherever you were before.
+function goHome() {
+  let cameFromIndex = false;
+  try {
+    const ref = new URL(document.referrer);
+    cameFromIndex = ref.origin === location.origin && /(^|\/)(index\.html)?$/.test(ref.pathname);
+  } catch (e) {}
+  if (cameFromIndex && history.length > 1) {
+    history.back();
+  } else {
+    location.replace('index.html');
+  }
+}
+
+// The on-page "← BACK" link uses goHome() (the plain link still works as a fallback)
+document.getElementById('back-button').addEventListener('click', e => {
+  if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;   // keep "open in new tab" working
+  e.preventDefault();
+  goHome();
+});
 
 // ---------- Show a message instead of wiping the whole page ----------
 function showMessage(text) {
   document.getElementById('movie-heading').innerText = text;
   document.getElementById('movie-desc').innerText = '';
-  document.getElementById('trailer-frame').src = 'about:blank';
   document.getElementById('dynamic-db-styles').textContent = '';
   document.getElementById('val').innerText = '0.0';
   document.getElementById('vote-msg').innerText = '';
   document.title = text;
 }
 
-// ---------- Load ONE movie from Supabase and fill the page ----------
-// Returns 'ok', 'missing', 'error' or 'stale'
-async function loadMovieData() {
-  const myLoad = ++loadCounter;     // number of this request
-  const idToLoad = currentId;
+// ---------- 1) Download ONE movie from Supabase (does not touch the page) ----------
+async function fetchMovie(id) {
+  try {
+    const { data: movie, error } = await supabaseClient
+      .from('movies_details')
+      .select(`
+        *,
+        movie_ratings (
+          total_points,
+          total_votes
+        )
+      `)
+      .eq('id', id)
+      .maybeSingle();                 // no row = null (not an error)
+    if (error) return { status: 'error' };
+    if (!movie) return { status: 'missing' };
+    return { status: 'ok', movie };
+  } catch (e) {
+    return { status: 'error' };
+  }
+}
 
-  const { data: movie, error } = await supabaseClient
-    .from('movies_details')
-    .select(`
-      *,
-      movie_ratings (
-        total_points,
-        total_votes
-      )
-    `)
-    .eq('id', idToLoad)
-    .maybeSingle();                 // no row = null (not an error)
+// ---------- 2) Put that movie on the page. Returns the trailer address ----------
+function applyMovie(id, result) {
+  shownId = id;
 
-  // If you swiped again while we were waiting, throw this answer away
-  if (myLoad !== loadCounter) return 'stale';
+  if (result.status === 'error') { showMessage('Could not load movie'); return ''; }
+  if (result.status === 'missing') { showMessage('Movie Not Found'); return ''; }
 
-  if (error) { showMessage('Could not load movie'); return 'error'; }
-  if (!movie) { showMessage('Movie Not Found'); return 'missing'; }
+  const movie = result.movie;
 
   // Rating (movie_ratings can come back as an array or as one object)
   const r = movie.movie_ratings;
@@ -133,7 +194,7 @@ async function loadMovieData() {
   const totalVotes = ratingData ? ratingData.total_votes : 0;
   const totalPoints = ratingData ? ratingData.total_points : 0;
   const avgScore = totalVotes > 0 ? (totalPoints / totalVotes).toFixed(1) : "0.0";
-  const ranking = movie.ranking || idToLoad;
+  const ranking = movie.ranking || id;
 
   // Fill the HTML
   document.title = movie.title;
@@ -145,7 +206,6 @@ async function loadMovieData() {
   heading.className = movie['lava-color'] || '';              // replace the class, don't pile them up
 
   document.getElementById('movie-desc').innerText = movie.description || '';
-  document.getElementById('trailer-frame').src = movie.trailer_url || 'about:blank';
 
   const backBtn = document.getElementById('back-button');
   backBtn.className = movie['lava-color'] || '';
@@ -191,10 +251,10 @@ async function loadMovieData() {
   `;
 
   // Download the neighbours' backgrounds now, so the next swipe shows them instantly
-  preloadBackgrounds(idToLoad + 1);
-  preloadBackgrounds(idToLoad - 1);
+  preloadBackgrounds(id + 1);
+  preloadBackgrounds(id - 1);
 
-  return 'ok';
+  return movie.trailer_url || '';
 }
 
 // ---------- Download a movie's background images ahead of time ----------
@@ -222,24 +282,79 @@ async function loadLastId() {
   if (data && data.id) lastId = data.id;
 }
 
+// ---------- The slide animation ----------
+// "translate" is used (not "transform") so it never fights with any centering
+// your movie-style.css may already do with transform.
+function slide(keyframes, easing) {
+  if (!canAnimate || reduceMotion.matches) return Promise.resolve();   // no animation: just swap
+  document.documentElement.classList.add('is-swiping');
+  return Promise.all(slideTargets.map(el =>
+    el.animate(keyframes, { duration: SLIDE_MS / 2, easing: easing, fill: 'forwards' }).finished
+  ));
+}
+function slideOut(step) {     // old content leaves: next movie (+1) leaves to the left
+  return slide([
+    { translate: '0 0', opacity: 1 },
+    { translate: `${-step * SLIDE_DISTANCE_VW}vw 0`, opacity: 0 }
+  ], 'ease-in');
+}
+function slideIn(step) {      // new content arrives from the opposite side
+  return slide([
+    { translate: `${step * SLIDE_DISTANCE_VW}vw 0`, opacity: 0 },
+    { translate: '0 0', opacity: 1 }
+  ], 'ease-out');
+}
+function clearAnimations() {
+  slideTargets.forEach(el => el.getAnimations().forEach(a => a.cancel()));
+  document.documentElement.classList.remove('is-swiping');
+}
+
 // ---------- Go to the next (+1) or previous (-1) movie ----------
-function goToMovie(step) {
+async function goToMovie(step) {
   dismissHint();
+
+  // A swipe during an animation is remembered and done right after
+  if (busy) { queuedStep = step; return; }
+
   const newId = currentId + step;
   if (newId < 1 || newId > lastId) {
-    window.location.href = 'index.html';     // same behaviour as before at the ends
+    goHome();                                // past the first/last movie: back to the index
     return;
   }
+
+  busy = true;
   currentId = newId;
   // Update the address bar WITHOUT reloading and WITHOUT adding a history entry,
   // so refresh/share keeps the right movie and BACK still goes to index.html
-  history.replaceState(null, '', '?id=' + currentId);
-  loadMovieData();
+  history.replaceState(null, '', '?id=' + newId);
+
+  let trailerUrl = '';
+  try {
+    const dataPromise = fetchMovie(newId);   // start downloading right away, while the old content leaves
+    await slideOut(step);
+    const result = await dataPromise;
+    trailerUrl = applyMovie(newId, result);  // swap the content while it is out of sight
+    setTrailer('');                          // empty frame, so the old trailer is gone
+    await slideIn(step);
+  } catch (e) {
+    console.error(e);
+  } finally {
+    clearAnimations();
+    busy = false;
+  }
+
+  if (queuedStep) {
+    const next = queuedStep;
+    queuedStep = 0;
+    goToMovie(next);                         // don't load a trailer that would be replaced at once
+  } else {
+    setTrailer(trailerUrl);                  // the video loads once the slide has finished
+  }
 }
 
 // ---------- Voting ----------
 async function sendVote(stars) {
-  const votedId = currentId;                 // remember which movie was voted, even if you swipe meanwhile
+  const votedId = shownId;                   // the movie you actually see on the screen
 
   const { data: rating } = await supabaseClient
     .from('movie_ratings')
@@ -264,7 +379,7 @@ async function sendVote(stars) {
   }
 
   // Only touch the screen if we are still on the movie that was voted
-  if (votedId === currentId) {
+  if (votedId === shownId) {
     document.getElementById('val').innerText = (newPoints / newVotes).toFixed(1);
     document.getElementById('vote-msg').innerText = 'Voted!';
   }
@@ -298,9 +413,13 @@ mc.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL, threshold: 5, velo
 mc.on("swipeleft",  () => goToMovie(+1));    // swipe left  -> next movie
 mc.on("swiperight", () => goToMovie(-1));    // swipe right -> previous movie
 
-// ---------- Start ----------
-loadMovieData();
-loadLastId();
+// ---------- Start (first movie: no animation) ----------
+(async function start() {
+  const result = await fetchMovie(currentId);
+  const trailerUrl = applyMovie(currentId, result);
+  setTrailer(trailerUrl);
+  loadLastId();
+})();
 </script>
 </body>
 </html>
