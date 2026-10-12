@@ -103,22 +103,22 @@ let queuedStep = 0;                                    // a swipe made during an
 // ---------- The three things that slide together ----------
 const movieContainer = document.getElementById('movie-container');
 const ratingBox = document.getElementById('rating-box');
-const trailerFrame = document.getElementById('trailer-frame');
-const slideTargets = [movieContainer, ratingBox, trailerFrame];
+let trailerFrame = document.getElementById('trailer-frame');   // "let": the element gets replaced for every trailer
+const getSlideTargets = () => [movieContainer, ratingBox, trailerFrame];
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 const canAnimate = typeof Element.prototype.animate === 'function';
 
 // ---------- Trailer ----------
-// location.replace() changes the video WITHOUT adding a browser-history entry.
-// (Setting iframe.src adds one each time, and the Back button would then step
-// through every old trailer before leaving the page.)
+// Every trailer gets a brand-new <iframe> element, with its address set BEFORE it is
+// put on the page. A new iframe's first load never adds a browser-history entry.
+// (Changing the address of an existing iframe can add one each time, and then the
+// Back arrow only changes the trailer instead of leaving the page.)
 function setTrailer(url) {
-  const target = url || 'about:blank';
-  try {
-    trailerFrame.contentWindow.location.replace(target);
-  } catch (e) {
-    trailerFrame.src = target;
-  }
+  const fresh = trailerFrame.cloneNode(false);   // same id, class, allowfullscreen...
+  fresh.removeAttribute('src');
+  if (url) fresh.src = url;                      // no address = an empty frame
+  trailerFrame.replaceWith(fresh);
+  trailerFrame = fresh;
 }
 
 // ---------- Leave the movie page the way the browser's Back arrow would ----------
@@ -135,6 +135,10 @@ function goHome() {
   } catch (e) {}
   if (cameFromIndex && history.length > 1) {
     history.back();
+    // Safety net: if we are still here a moment later (something else in the history
+    // swallowed the Back step), go to the index page directly.
+    const fallback = setTimeout(() => location.replace('index.html'), 900);
+    window.addEventListener('pagehide', () => clearTimeout(fallback), { once: true });
   } else {
     location.replace('index.html');
   }
@@ -288,7 +292,7 @@ async function loadLastId() {
 function slide(keyframes, easing) {
   if (!canAnimate || reduceMotion.matches) return Promise.resolve();   // no animation: just swap
   document.documentElement.classList.add('is-swiping');
-  return Promise.all(slideTargets.map(el =>
+  return Promise.all(getSlideTargets().map(el =>
     el.animate(keyframes, { duration: SLIDE_MS / 2, easing: easing, fill: 'forwards' }).finished
   ));
 }
@@ -305,7 +309,7 @@ function slideIn(step) {      // new content arrives from the opposite side
   ], 'ease-out');
 }
 function clearAnimations() {
-  slideTargets.forEach(el => el.getAnimations().forEach(a => a.cancel()));
+  getSlideTargets().forEach(el => el.getAnimations().forEach(a => a.cancel()));
   document.documentElement.classList.remove('is-swiping');
 }
 
