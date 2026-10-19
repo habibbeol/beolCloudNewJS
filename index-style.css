@@ -106,6 +106,8 @@ a:hover { color: pink; } /* */
         bottom: 0vmin;
         right: 0vmin;
         margin-top: 3vw;
+           font-size: 12px;
+        line-height: 1.5;
     }
     
     .text { width: 84vw; } /* */
